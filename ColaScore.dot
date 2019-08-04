@@ -1,0 +1,9 @@
+digraph G{ rankdir=LR;
+3870641[shape=record, style=filled, fillcolor=seashell2,label="(Eduardo,1)"];
+3870641->3870637
+3870637[shape=record, style=filled, fillcolor=seashell2,label="(Saul,2)"];
+3870637->3870633
+3870633[shape=record, style=filled, fillcolor=seashell2,label="(Tun,3)"];
+null[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
+3870633->null[ color="blue"]
+}

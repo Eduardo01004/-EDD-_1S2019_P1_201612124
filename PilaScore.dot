@@ -1,0 +1,4 @@
+digraph G{ rankdir=LR;
+node [shape= record, width=.1,height=.1];
+nodeTable [label = " |(2,3)|(3,2)|(4,1)"];
+}

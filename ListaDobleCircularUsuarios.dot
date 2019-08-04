@@ -1,0 +1,14 @@
+digraph CircularList {
+3870619[fillcolor=seashell2,label="Eduardo"];
+3870619->3870571
+3870571->3870619
+3870571[fillcolor=seashell2,label="Saul"];
+3870571->3870549
+3870549->3870571
+3870549[fillcolor=seashell2,label="Tun"];
+3870549->3870553
+3870553->3870549
+3870553[fillcolor=seashell2,label="Aguilar"];
+3870553->3870619
+3870619->3870553
+}
