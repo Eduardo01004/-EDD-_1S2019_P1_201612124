@@ -1,20 +1,23 @@
 import os
+from random import randint
 
 class NodoPila:
     def __init__(self,coorx=None,coory=None,siguiente=None):
         self.coorx=coorx
         self.coory=coory
         self.siguiente=siguiente
+        self.x = randint(1, 33)
+        self.y = randint(1, 18)
 
     def __str__(self):
         return " %s %s" %(self.coorx,self.coory)
+
 
 
 class PilaScore:
     def __init__(self):
         self.primero=None
         self.ultimo=None
-
 
     def InsertarScore(self, coorx, coory):
         nuevo=NodoPila(coorx,coory)
@@ -35,6 +38,14 @@ class PilaScore:
         else:
             self.primero=temporal.siguiente
 
+    def render(self,window):
+        temp=self.primero
+        prob=randint(1, 4)
+
+        while temp != None:
+            window.addstr(x, y, '*')
+            temp=temp.siguiente
+
 
 
 
@@ -51,10 +62,9 @@ class PilaScore:
                 else:
                     c=str(hash(aux))
                     file.write("|"+"("+str(aux.coorx)+","+str(aux.coory)+")")
-
                 aux=aux.siguiente
         file.write("\"];\n")
         file.write("}")
         file.close()
         os.system("dot -Tpng PilaScore.dot -o PilaScore.png")
-        #os.system(" PilaScore.png")
+        os.system(" PilaScore.png")

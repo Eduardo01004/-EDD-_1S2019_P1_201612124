@@ -65,4 +65,4 @@ class ListaCircularDobleUsuarios:
         file.write("}")
         file.close()
         os.system("dot -Tpng ListaDobleCircularUsuarios.dot -o ListaDobleCircularUsuarios.png")
-        #os.system("ListaDobleCircularUsuarios.png")
+        os.system("ListaDobleCircularUsuarios.png")

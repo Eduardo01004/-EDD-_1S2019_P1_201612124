@@ -26,10 +26,10 @@ class ColaScore:
         aux=self.primero
         contador=0
         while(aux!=None):
-            contador++
+            
 
             aux=aux.siguiente
-    
+
 
 
 

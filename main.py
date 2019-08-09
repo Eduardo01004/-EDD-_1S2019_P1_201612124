@@ -3,103 +3,175 @@ from ListaCicularDoble_Usuarios import ListaCircularDobleUsuarios
 from ScorePila import PilaScore
 from Cola_ScoreBoard import ColaScore
 import curses
-from curses import textpad
+from curses import KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_UP
+from random import randint
 import time
-#-----------------------------------------MENU DE OPCIONES---------------------------------
-opciones_menu=['1. Play','2. ScoreBoard', '3. User selection','4. Reportes','5.Carga de usuarios','6. Salir']
+import csv
+listasnake=ListaDoble()
+listausuarios=ListaCircularDobleUsuarios()
+score=PilaScore()
+cola=ColaScore()
+WIDTH = 35 #ancho
+HEIGHT = 20 # altura
+#------------------------------MENU PRINCIPAL-----------------------------
+def Menu_Principal(window):
 
-def Menu(stdscr,selected_row_idx):
-    stdscr.clear()
-    h, w = stdscr.getmaxyx()
+    Titulo(window,'Main Menu')
+    window.addstr(7,21, '1. Play')
+    window.addstr(8,21, '2. Scoreboard')
+    window.addstr(9,21, '3. User Selection')
+    window.addstr(10,21, '4. Reports')
+    window.addstr(11,21, '5. Bulk Loading')
+    window.addstr(12,21, '6. Exit')
+    window.timeout(-1)
 
-    for idx,row in enumerate(opciones_menu):
-        x = w//2 - len(row)//2
-        y = h//2 - len(opciones_menu)//2 +idx
-        if idx == selected_row_idx:
-            stdscr.attron(curses.color_pair(1))
-            stdscr.addstr(y,x,row)
-            stdscr.attroff(curses.color_pair(1))
+
+def Titulo(window,var):
+    window.clear()
+    window.border()
+    centro = round((60-len(var))/2)
+    window.addstr(0,centro,var)
+
+def TeclaESC(window):
+    tecla=window.getch()
+    while tecla!=27:
+        tecla = window.getch()
+
+
+def m(window):
+    keystroke = -1
+    while(keystroke==-1):
+        keystroke = window.getch()
+        if(keystroke==49): #1
+            Titulo(window, ' PLAY ')
+            TeclaESC(window)
+            Menu_Principal(window)
+            keystroke=-1
+        elif(keystroke==50):
+            Titulo(window, ' SCOREBOARD ')
+            TeclaESC(window)
+            Menu_Principal(window)
+            keystroke=-1
+        elif(keystroke==51):
+            Titulo(window, ' USER SELECTION ')
+            Menu_Usuarios(window)
+            TeclaESC(window)
+            Menu_Principal(window)
+            keystroke=-1
+        elif(keystroke==52):
+            Titulo(window,' Reports')
+            Principal_Usuarios(window)
+            TeclaESC(window)
+            window.refresh()
+            window.clear()
+            Menu_Principal(window)
+            keystroke=-1
+        elif(keystroke==53):
+            Titulo(window,' BULK LOADING ')
+            TeclaESC(window)
+            Menu_Principal(window)
+            LeerArchivo_Usuarios(window)
+
+            keystroke=-1
+        elif(keystroke==54):
+            pass
         else:
-            stdscr.addstr(y,x,row)
+            keystroke=-1
+#----------------------------------fin menu principal----------------------///
 
-    stdscr.refresh()
+#------------------CARGA DE ARCHIVOS DE USUARIOS-------------------
+def LeerArchivo_Usuarios(window):
+
+    with open('Usuario.csv') as file:
+        reader = csv.reader(file)
+        line_count = 0
+        for row in reader:
+            if line_count == 0:
+                line_count += 1
+            else:
+                listausuarios.InsertarUsuario(row[0])
+                line_count +=  1
+
+def print_Users(window, name):
+    window.clear()
+    height, width = window.getmaxyx()
+    window.addstr(int(height//2), int(width/2 - 4), name)
+    window.addstr(int(height//2 + 1), int(width/2 - 14), "<- Press Enter to select ->")
+    window.refresh()
+
+def Menu_Usuarios(window):
+    temp=listausuarios.primero
+    name=temp.nombre
+    temp2=listausuarios.ultimo
+    validar=True
+    print_Users(window, name)
+    while(validar):
+        key = window.getch()
+        if key == curses.KEY_RIGHT:
+            temp = temp.siguiente
+            name = temp.nombre
+        elif key == curses.KEY_LEFT:
+            temp = temp.anterior
+            name = temp.nombre
+        elif key == curses.KEY_LEFT or key == 10:
+            break
+        print_Users(window, name)
+    window.clear()
+
+#-----------------------------MENU DE REPORTES ------------------------------
+def Menu_Reportes(window):
+    Titulo(window,'Reportes')
+    window.addstr(7,21, '1. Snake Report(Lista Doble)')
+    window.addstr(8,21, '2. ScoreReport(Pila)')
+    window.addstr(9,21, '3. Scoreboard Report(Cola)')
+    window.addstr(10,21, '4. Users Report(Lista Circular Doble)')
+    window.addstr(11,21, '5. Main Menu')
+    window.addstr(12,21, '6. Exit')
+    window.timeout(-1)
+
+def Principal_Usuarios(window):
+    window.clear()
+    Menu_Reportes(window)
+    keystroke = -1
+    while(keystroke==-1):
+        keystroke = window.getch()
+        if(keystroke==49): #1
+            listasnake.GraficarDobleSnake()
+            keystroke=-1
+        elif(keystroke==50):
+            score.Graficarpila()
+            keystroke=-1
+        elif(keystroke==51):
+            cola.GraficarCola()
+            keystroke=-1
+        elif(keystroke==52):
+            listausuarios.GraficarUsuarios()
+            keystroke=-1
+        elif(keystroke==53):
+            TeclaESC(window)
+            Menu_Principal(window)
+            m(window)
+            keystroke=-1
+        elif(keystroke==54):#salir
+            pass
+        else:
+            keystroke=-1
+    window.refresh()
+
+#------------------------INICIO DEL PROGRAMA----------------------------
+stdscr = curses.initscr()
+curses.beep()
+curses.beep()
+window = curses.newwin(20,60,0,0)
+window.keypad(True)
+curses.noecho()
+curses.curs_set(0)
+
+Menu_Principal(window)
+m(window)
 
 
 
-def main(stdscr):
-    curses.curs_set(0)
-    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
-    current_row_idx=0
-
-    Menu(stdscr,current_row_idx)
-    stdscr.refresh()
-    stdscr.getch()
-
-    while 1:
-        key = stdscr.getch()
-        stdscr.clear()
-        if key == curses.KEY_UP and current_row_idx > 0:
-            current_row_idx -= 1
-        elif key == curses.KEY_DOWN and current_row_idx < len(opciones_menu)-1:
-            current_row_idx += 1
-        elif key == curses.KEY_ENTER or key in [10,13]:
-            stdscr.addstr(0,0,"opcion {}".format(opciones_menu[current_row_idx]))
-
-            if current_row_idx == len(opciones_menu)-1:#boton salir
-                break
-            elif current_row_idx == len(opciones_menu)-6:
-                curses.wrapper(mainSnake)
 
 
-        Menu(stdscr,current_row_idx)
-        stdscr.refresh()
-
-#----------------------------------------JUEGO DE SNAKE------------------------
-def mainSnake(stdscr):
-    curses.curs_set(0)
-    sh,sw = stdscr.getmaxyx()
-    box =[[3,3],[sh-3,sw-3]]
-    textpad.rectangle(stdscr,box[0][0],box[0][1],box[1][0],box[1][1])
-    snake=[[sh//2,sw//2+1],[sh//2,sw//2],[sh//2,sw//2-1]]
-    direccion=curses.KEY_RIGHT
-
-    for y,x in snake:
-        stdscr.addstr(y,x,'#')
-    stdscr.refresh()
-    stdscr.getch()
-
-
-
-
-
-if __name__=="__main__":
-
-    curses.wrapper(main)
-    listadoble=ListaDoble()
-    listadoble.Insertar(5,4)
-    listadoble.Insertar(5,3)
-    listadoble.Insertar(5,2)
-    listadoble.Listar()
-    listadoble.GraficarDobleSnake()
-
-    usuarios=ListaCircularDobleUsuarios()
-    usuarios.InsertarUsuario("Eduardo")
-    usuarios.InsertarUsuario("Saul")
-    usuarios.InsertarUsuario("Tun")
-    usuarios.InsertarUsuario("Aguilar")
-    usuarios.Listar()
-    usuarios.GraficarUsuarios()
-
-    score=PilaScore()
-    score.InsertarScore(4,1)
-    score.InsertarScore(3,2)
-    score.InsertarScore(2,3)
-    score.InsertarScore(1,4)
-    score.Pop()
-    score.Graficarpila()
-
-    cola=ColaScore()
-    cola.IngresarCola("Eduardo",1)
-    cola.IngresarCola("Saul",2)
-    cola.IngresarCola("Tun",3)
-    cola.GraficarCola()
+curses.endwin()
