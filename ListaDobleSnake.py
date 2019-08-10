@@ -7,8 +7,8 @@ WIDTH = 35
 HEIGHT = 20
 MAX_X = WIDTH - 2
 MAX_Y = HEIGHT - 2
-TIMEOUT = 150
-pilascore=PilaScore()
+TIMEOUT = 100
+p=PilaScore()
 class NodoDoble:
 
     def __init__(self, coorx, coory):
@@ -28,10 +28,17 @@ class ListaDoble:
         self.punteo=0
         self.x = randint(1, MAX_X)
         self.y = randint(1, MAX_Y)
+        self.x2 = randint(1, MAX_X)
+        self.y2 = randint(1, MAX_Y)
+        self.tiempo=TIMEOUT
+        self.nivel=1
 
     @property
     def score(self):
         return 'Score : {}'.format(self.punteo)
+    @property
+    def Nivel(self):
+        return 'Nivel : {}'.format(self.nivel)
 
     def Insertar(self,coorx,coory):
         nuevo=NodoDoble(coorx,coory)
@@ -83,26 +90,46 @@ class ListaDoble:
         temp=self.primero
         prob=randint(1, 4)
         while temp != None:
-                window.addstr(self.y, self.x, '+')
+            window.addstr(self.y, self.x, '+')
             temp=temp.siguiente
+
     def render2(self,window):
         temp=self.primero
         prob=randint(1, 4)
         while temp != None:
-                window.addstr(self.y, self.x, '*')
+            window.addstr(self.y2, self.x2, '*')
             temp=temp.siguiente
 
-    def Comer(self,x,y,s):
+    def Comer(self,x,y,s,window):
         s.reiniciar()
         s.Insertar_Inicio(x,y)
-        self.punteo+=1
+        self.punteo += 1
+        if self.punteo <= 6:
+            p.InsertarScore(x,y)
+        else:
+            self.tiempo -= 5
+            self.nivel = 2
+            window.timeout(self.tiempo)
+            p.InsertarScore2(x,y)
 
     def reiniciar(self):
         self.x = randint(1, MAX_X)
         self.y = randint(1, MAX_Y)
 
-
-
+    def Colision(self,x,y):
+        temp=self.primero
+        aux=temp.siguiente
+        bandera=True
+        while aux!=None:
+            coorx=aux.coorx
+            coory=aux.coory
+            if coorx==x and coory==y:
+                bandera=True
+                break
+            else:
+                bandera=False
+            aux=aux.siguiente
+        return bandera
 
 
     def GraficarDobleSnake(self):
@@ -147,6 +174,7 @@ if __name__ == '__main__':
     curses.curs_set(0)
     window.border()
     s=ListaDoble()
+
     s.Insertar_Inicio(3,5)
     s.Insertar_Inicio(4,5)
     s.Insertar_Inicio(5,5)
@@ -162,28 +190,26 @@ if __name__ == '__main__':
         x=aux.coorx
         y=aux.coory
         s.render(window)
+        s.render2(window)
         s.Listar(window)
 
         window.addstr(0, 5, s.score)
+        window.addstr(0, 20, s.Nivel)
         key = window.getch()
         if key == 27:
             break
         if key in [curses.KEY_RIGHT, curses.KEY_LEFT, curses.KEY_DOWN, curses.KEY_UP]:
             direction = key
-
-
         if direction == curses.KEY_RIGHT:
             movimiento="Derecha"
             x+=1
             if x > MAX_X:
                 x = 1
-
         elif direction == curses.KEY_LEFT:
             movimiento="Izquierda"
             x-=1
             if x < 1:
                 x = MAX_X
-
         elif direction == curses.KEY_DOWN:
             movimiento="Abajo"
             y+=1
@@ -195,8 +221,20 @@ if __name__ == '__main__':
             if y < 1:
                 y = MAX_Y
         if x==auxx and y==auxy:
-            s.Comer(x,y,s)
-
+            s.Comer(x,y,s,window)
+        if s.Colision(x,y)==True:
+            window.clear()
+            msg = "Game Over!"
+            centro = round((60-len(msg))/2)
+            window.addstr(0,centro,msg)
+            print("perdio")
+            curses.beep()
+            window.nodelay(0)
+            window.getch()
+            window.refresh()
+            curses.echo()
+            s.GraficarDobleSnake()
+            p.Graficarpila()
         s.Eliminar_Ultimo()
         s.Insertar_Inicio(x,y)
 
