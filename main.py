@@ -170,8 +170,4 @@ curses.curs_set(0)
 Menu_Principal(window)
 m(window)
 
-
-
-
-
 curses.endwin()

@@ -1,170 +1,97 @@
-'''
-    Snake Game Part finished
-'''
+# INSTRUCTIONS: - UP, RIGHT, DOWN, LEFT, ARROWS TO PLAY
+#               - 'SPACEBAR' TO PAUSE / RESUME
+#               - PRESS 'ESC' BUTTON WHILE THE IS CURSER MOVING TO QUIT. WILL NOT ESCAPE IF PAUSED.
+#               - HAVE FUN!! It's even more breaking down the code and understanding it all! :)
+#
+# UPDATE: Corrected my comments to reflect python syntax. No more "array".
+
 
 import curses
-from curses import KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_UP
+from curses import KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN, A_BOLD, A_UNDERLINE
 from random import randint
-
 WIDTH = 35
 HEIGHT = 20
 MAX_X = WIDTH - 2
 MAX_Y = HEIGHT - 2
-SNAKE_LENGTH = 3
-SNAKE_X = SNAKE_LENGTH + 1
-SNAKE_Y = 3
-TIMEOUT = 1000
 
-class Snake(object):
-    REV_DIR_MAP = {
-        KEY_UP: KEY_DOWN, KEY_DOWN: KEY_UP,
-        KEY_LEFT: KEY_RIGHT, KEY_RIGHT: KEY_LEFT,
-    }
+print(KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_LEFT)                                        # Put this print statement so you can see what these values are in case you don't want to go look for them. Will print after the game ends.
+curses.initscr()                                                                    # This is the initialization of the terminal window.
+win = curses.newwin(HEIGHT , WIDTH, 0, 0)                                                 # This will size the window to what you want.
 
-    def __init__(self, x, y, window):
-        self.body_list = []#array inicializa
-        self.hit_score = 0#punteo
-        self.timeout = TIMEOUT#delay
-
-        for i in range(SNAKE_LENGTH, 0, -1):#(inicio,final,paso)321salida
-            self.body_list.append(Body(x - i, y))#esto pinta la serpiente inicial de tamano 3
-
-        self.window = window
-        self.direction = KEY_RIGHT
-        self.last_head_coor = (x, y)# ESTA ES LA ULTIMA COORDENADA DE LA CABEZA
-        self.direction_map = {
-            KEY_UP: self.move_up,
-            KEY_DOWN: self.move_down,
-            KEY_LEFT: self.move_left,
-            KEY_RIGHT: self.move_right
-        }
-
-    @property
-    def score(self):
-        return 'Score : {}'.format(self.hit_score)
-
-    def eat_food(self, food):
-        food.reset()
-        body = Body(self.last_head_coor[0], self.last_head_coor[1])
-        self.body_list.insert(-1, body)
-        self.hit_score += 1
-        if self.hit_score % 3 == 0:
-            self.timeout -= 5
-            self.window.timeout(self.timeout)
-
-    @property
-    def collided(self):#cuando la serpiente se toca ella misma
-        return any([body.coor == self.head.coor
-                    for body in self.body_list[:-1]])
+win.attron(A_BOLD)                                                                  # Makes the message "snake attack!" in bold lettering
+win.addstr( 15, 25, 'Snake attack!' )                                               # Just a fun message, immediately eaten by the snake when it starts. It doesn't add body to the snake
+win.attroff(A_BOLD)                                                                 # Ends the bold lettering for "snake attack!"
+win.keypad(1)                                                                       # Keep 1. 1 = yes. 0 = no.
+curses.noecho()
+curses.curs_set(0)                                                                  # Curser 0 = invis. 1 = visible. 2 = very freakin visible.
+win.nodelay(1)                                                                      # Why is this not making a difference?
 
 
-    def update(self):
-        last_body = self.body_list.pop(0)
-        last_body.x = self.body_list[-1].x
-        last_body.y = self.body_list[-1].y
-        self.body_list.insert(-1, last_body)
-        self.last_head_coor = (self.head.x, self.head.y)
-        self.direction_map[self.direction]()
+key = KEY_RIGHT                                                                     # Assigning value for key
+score = 0                                                                           # Assigning value to score
+count = 0
+snake = [[15,15],[0,0]]                                                             # snake[0] is the starting position. Each new list within the list is a "body part" so in this case the snake starts with 2 body parts.
 
-    def change_direction(self, direction):
-        if direction != Snake.REV_DIR_MAP[self.direction]:
-            self.direction = direction
-
-    def render(self):
-        for body in self.body_list:
-            self.window.addstr(body.y, body.x, body.char)
-
-    @property
-    def head(self):
-        return self.body_list[-1]
-
-    @property
-    def coor(self):
-        return self.head.x, self.head.y
-
-    def move_up(self):
-        self.head.y -= 1
-        if self.head.y < 1:
-            self.head.y = MAX_Y
-
-    def move_down(self):
-        self.head.y += 1
-        if self.head.y > MAX_Y:
-            self.head.y = 1
-
-    def move_left(self):
-        self.head.x -= 1
-        if self.head.x < 1:
-            self.head.x = MAX_X
-
-    def move_right(self):
-        self.head.x += 1
-        if self.head.x > MAX_X:
-            self.head.x = 1
-
-class Body(object):#cuerpo de la serpiente
-    def __init__(self, x, y, char='#'):
-        self.x = x
-        self.y = y
-        self.char = char
-
-    @property
-    def coor(self):
-        return self.x, self.y
-
-class Food(object):#comida
-    def __init__(self, window, char='+'):
-        self.x = randint(1, MAX_X)
-        self.y = randint(1, MAX_Y)
-        self.char = char
-        self.window = window
-
-    def render(self):
-        self.window.addstr(self.y, self.x, self.char)
-
-    def reset(self):
-        self.x = randint(1, MAX_X)
-        self.y = randint(1, MAX_Y)
+food = [randint(1, MAX_X), randint(1, MAX_Y)]                                            # coordinates of where the first piece of food will be in the window. Random makes it more fun than the same spot each time.
+win.addch(food[0], food[1], '*')                                                    # Assigns a character for that particular spot on the window where the food will start. Both index 0, and index 1, of Food will need the same char symbol. Think about it.
 
 
-if __name__ == '__main__':
-    curses.initscr()
-    curses.beep()
-    curses.beep()
-    window = curses.newwin(HEIGHT, WIDTH, 0, 0)
-    window.timeout(TIMEOUT)
-    window.keypad(1)
-    curses.noecho()
-    curses.curs_set(0)
-    window.border(0)
-    snake = Snake(SNAKE_X, SNAKE_Y, window)
-    food = Food(window, '+')
+while key != 27:                                                                    # This is where the fun happens. 27 ASCII code for 'ESC'. When you hit it, while it's moving. It will break the while loop and end the window.
+    win.attron(A_BOLD)
+    win.border(0)
+    win.addstr(0, 15, ' Score : ' + str(score) + ' ')                               # Printing 'Score' on the window. You can position it where ever you want.
+    win.addstr(0, 10, ' SNAKE! Traveled - ' + str(count) + ' spaces! ')             # Printing 'SNAKE' on the window. You can position it where ever you want
+    win.attroff(A_BOLD)
 
-    while True:
-        window.clear()
-        window.border(0)
-        snake.render()
-        food.render()
+    speed = int(100)                          # Adjusts the speed. Write it out if it helps you do the math on how this equates.
+    win.timeout(speed)                                                              # Each time you eat food and a body part extends the body, this number will adjust to make it go faster.
+    count += 1
 
-        window.addstr(0, 5, snake.score)
-        event = window.getch()
+    prevKey = key                                                                   # Assigns var prevKey to the current key, or the last key pressed if unpressed again.
+    event = win.getch()                                                             # var event waiting for win.getch() to capture character from user so it can exist.
+    key = key if event == -1 else event
 
-        if event == 27:
-            break
+    if key == ord(' '):                                                             # empty space == '32' which is ASCII for 'space bar'. If the keystroke is spacebar, key is assigned to 32 and gets stuck in this if statement. Then key is reassigned to -1.
+        key = -1                                                                    # one (Pause/Resume)
 
-        if event in [KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT]:
-            snake.change_direction(event)
+        while key != ord(' '):                                                      # Tried to explain the loop but it takes too much text. Figure it out :D
+            key = win.getch()
+            curses.beep()                                                           # Added a beep so you can hear when it repeats the loop. Just delete if it's annoying.
 
-        if snake.head.x == food.x and snake.head.y == food.y:
-            snake.eat_food(food)
+        key = prevKey
+        continue
 
-        if event == 32:
-            key = -1
-            while key != 32:
-                key = window.getch()
-        snake.update()
-        if snake.collided:
-            break
+    if key not in [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, 27]:                      # If an invalid key is pressed it reverts back to the stored prevKey
+        key = prevKey
+
+    # This insert actually adds a new list (head) to the snake, then the if statement below about the food, the else: in that statement actually pops the last list within the list so it appears to stay the same length when in fact it does increase here.
+    snake.insert(0, [snake[0][0] + (key == KEY_DOWN and 1) + (key == KEY_UP and -1), snake[0][1] + (key == KEY_LEFT and -1) + (key == KEY_RIGHT and 1)])
+
+    # Will exit the game if the borders are touched by the snake.
+    if snake[0][0] == 0 or snake[0][0] == 49 or snake[0][1] == 0 or snake[0][1] == 119:
+        curses.beep()
+        break
 
 
-    curses.endwin()
+    if snake[0] in snake[1:]:                                       # If the snakehead's [x,y] list values match another value within the snakes list. It will exit.
+        break
+
+
+    if snake[0] == food:                                            # When snakes postion on the window matches the foods position = "eaten". This if statement will execute.
+        food = []                                                   # Reassigns food to an empty list, ready to be reassigned.
+        score += 1                                                  # LVL UP!
+        while food == []:                                           # Executed because the window is hungry for food.
+            food = [randint(1, MAX_X), randint(1, MAX_Y)]                # Random [x,y] list generated for the food, placing it somewhere on the window next.
+            if food in snake:                                       # If the new generated food list values match a set of values within the snakes list, it will reset the while.
+                food = []
+        win.addch(food[0], food[1], '+')                            # WHen the new food passes the while validator, it will then be assigned to actual food variable.
+    else:
+        last = snake.pop()                                          # Since the snake.insert statement above is adding new snake list (head), if the snake doesn't eat the food, then it's here that the snake.pop() pops the last [x,y] list within the snake list. (the tail end of the simulated snake)
+        win.addch(last[0], last[1], ' ')                            # Now the snakes list doesn't contain this [x,y] but it's still printed to the screen. So this is called to fill that particular [x,y] coordinate with blanks. Essentially eraseing the symbol.
+
+    win.addch(snake[0][0], snake[0][1], '@')                        # This keeps the head a '@'
+    win.addch(snake[1][0], snake[1][1], '$')                        # Keeps the body of the snake '$' making it look more like a snake in action!
+
+curses.endwin()                                                     # You should be able to figure this out.
+
+print('Your score was ' + str(score) + '!')

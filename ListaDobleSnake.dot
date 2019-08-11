@@ -2,28 +2,16 @@ digraph G {rankdir = "LR";
  subgraph cluster3{
 label="Snake";
 h[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
-936195[shape=record, style=filled, fillcolor=seashell2,label="(3,12)"];
-h->936195[dir=back color="blue"]
-936195[shape=record, style=filled, fillcolor=seashell2,label="(3,12)"];
-936195->936211
-936211->936195
-936211[shape=record, style=filled, fillcolor=seashell2,label="(3,13)"];
-936211->936199
-936199->936211
-936199[shape=record, style=filled, fillcolor=seashell2,label="(3,14)"];
-936199->936207
-936207->936199
-936207[shape=record, style=filled, fillcolor=seashell2,label="(3,13)"];
-936207->936215
-936215->936207
-936215[shape=record, style=filled, fillcolor=seashell2,label="(3,12)"];
-936215->930325
-930325->936215
-930325[shape=record, style=filled, fillcolor=seashell2,label="(3,11)"];
-930325->928829
-928829->930325
-928829[shape=record, style=filled, fillcolor=seashell2,label="(3,10)"];
+3195411[shape=record, style=filled, fillcolor=seashell2,label="(16,8)"];
+h->3195411[dir=back color="blue"]
+3195411[shape=record, style=filled, fillcolor=seashell2,label="(16,8)"];
+3195411->3120443
+3120443->3195411
+3120443[shape=record, style=filled, fillcolor=seashell2,label="(15,8)"];
+3120443->3197951
+3197951->3120443
+3197951[shape=record, style=filled, fillcolor=seashell2,label="(14,8)"];
 null[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
-928829->null[ color="blue"]
+3197951->null[ color="blue"]
 }
 }
