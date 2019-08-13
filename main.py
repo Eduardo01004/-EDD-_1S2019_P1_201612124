@@ -41,9 +41,11 @@ def TeclaESC(window):
 def m(window):
     keystroke = -1
     while(keystroke==-1):
+
         keystroke = window.getch()
         if(keystroke==49): #1
             Titulo(window, ' PLAY ')
+            listasnake.Juego(window,listasnake,score)
             TeclaESC(window)
             Menu_Principal(window)
             keystroke=-1
@@ -62,16 +64,14 @@ def m(window):
             Titulo(window,' Reports')
             Principal_Usuarios(window)
             TeclaESC(window)
-            window.refresh()
-            window.clear()
+
             Menu_Principal(window)
             keystroke=-1
         elif(keystroke==53):
             Titulo(window,' BULK LOADING ')
+            LeerArchivo_Usuarios(window)
             TeclaESC(window)
             Menu_Principal(window)
-            LeerArchivo_Usuarios(window)
-
             keystroke=-1
         elif(keystroke==54):
             pass
@@ -81,22 +81,69 @@ def m(window):
 
 #------------------CARGA DE ARCHIVOS DE USUARIOS-------------------
 def LeerArchivo_Usuarios(window):
+    archivo=carga(window)
+    try:
+        with open(archivo) as file:
+            reader = csv.reader(file)
+            line_count = 0
+            for row in reader:
+                if line_count == 0:
+                    line_count += 1
+                else:
+                    listausuarios.InsertarUsuario(row[0])#aqui se inserta el dato a la lista circular doble
+                    line_count +=  1
+                    
+            while True:
+                window.clear()
+                window.border(0)
+                Titulo(window,' BULK LOADING ')
+                msg="Carga Con exito"
+                centro = round((60-len(msg))/2)
+                window.addstr(10,centro,msg)
+                sel = window.getch()
+                if sel == 10:
+                    Menu_Principal(window)
+                    m(window)
+                    break
+    except:
+        while True:
+            window.clear()
+            window.border(0)
+            Titulo(window,' BULK LOADING ')
+            texto2="Error al cargar el archivo"
+            centro2 = round((60-len(texto2))/2)
+            window.addstr(10,centro2,texto2)
+            key2 = window.getch()
+            if key2 is 27:
+                carga(window)
+                break
 
-    with open('Usuario.csv') as file:
-        reader = csv.reader(file)
-        line_count = 0
-        for row in reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                listausuarios.InsertarUsuario(row[0])
-                line_count +=  1
+def carga(window):
+    window.clear()
+    window.border(0)
+    Titulo(window,' BULK LOADING ')
+    msg="Ingresa El nombre del archivo csv"
+
+    centro = round((60-len(msg))/2)
+    window.addstr(10,centro,msg)
+    texto = ""
+    while True:
+        centro2 = round((60-len(texto))/2)
+        window.addstr(15,centro,texto)
+        key = window.getch()
+        if key is 10:
+            break
+        elif key > 0:
+            texto += str(chr(key))
+    return texto
 
 def print_Users(window, name):
     window.clear()
+    Titulo(window,' BULK LOADING ')
     height, width = window.getmaxyx()
-    window.addstr(int(height//2), int(width/2 - 4), name)
-    window.addstr(int(height//2 + 1), int(width/2 - 14), "<- Press Enter to select ->")
+    text="<-    "+ name +"    -> "
+    centro = round((60-len(text))/2)
+    window.addstr(10, centro , text)
     window.refresh()
 
 def Menu_Usuarios(window):
@@ -116,6 +163,7 @@ def Menu_Usuarios(window):
         elif key == curses.KEY_LEFT or key == 10:
             break
         print_Users(window, name)
+
     window.clear()
 
 #-----------------------------MENU DE REPORTES ------------------------------
@@ -159,13 +207,13 @@ def Principal_Usuarios(window):
     window.refresh()
 
 #------------------------INICIO DEL PROGRAMA----------------------------
-stdscr = curses.initscr()
-curses.beep()
-curses.beep()
+curses.initscr()
 window = curses.newwin(20,60,0,0)
+window.timeout(300)
 window.keypad(True)
 curses.noecho()
 curses.curs_set(0)
+window.border(0)
 
 Menu_Principal(window)
 m(window)
