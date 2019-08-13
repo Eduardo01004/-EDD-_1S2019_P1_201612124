@@ -9,6 +9,7 @@ MAX_X = WIDTH - 2
 MAX_Y = HEIGHT - 2
 TIMEOUT = 100
 movimiento=""
+
 class NodoDoble:
 
     def __init__(self, coorx, coory):
@@ -19,33 +20,6 @@ class NodoDoble:
 
     def __str__(self):
         return "%s %s" %(self.coorx, self.coory)
-
-class comida:
-    def __init__(self, window):
-        self.window = window
-
-    def generar_comida(self, score):
-        self.poscomidax = randint(1, 98)
-        self.poscomiday = randint(1, 33)
-        if score == 0:
-            self.tipocomida = 10
-        else:
-            self.tipocomida = randint(1, 100)
-
-    def pintar_comida(self):
-        if self.tipocomida < 80:
-            self.window.addstr(self.poscomiday, self.poscomidax, "+")
-        else:
-            self.window.addstr(self.poscomiday, self.poscomidax, "*")
-
-    def coordenadacomidax(self):
-        return self.poscomidax
-
-    def coordenadacomiday(self):
-        return self.poscomiday
-
-    def obtenertipocomida(self):
-        return self.tipocomida
 
 class Food(object):
     def __init__(self, window,char='+'):
@@ -72,6 +46,7 @@ class ListaDoble:
         self.primero=None
         self.ultimo=None
         self.punteo=0
+        self.nombre=""
         self.tiempo=TIMEOUT
         self.nivel=1
         self.x = random.randint(1, MAX_X)
