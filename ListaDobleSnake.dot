@@ -2,16 +2,16 @@ digraph G {rankdir = "LR";
  subgraph cluster3{
 label="Snake";
 h[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
-3195411[shape=record, style=filled, fillcolor=seashell2,label="(16,8)"];
-h->3195411[dir=back color="blue"]
-3195411[shape=record, style=filled, fillcolor=seashell2,label="(16,8)"];
-3195411->3120443
-3120443->3195411
-3120443[shape=record, style=filled, fillcolor=seashell2,label="(15,8)"];
-3120443->3197951
-3197951->3120443
-3197951[shape=record, style=filled, fillcolor=seashell2,label="(14,8)"];
+878067[shape=record, style=filled, fillcolor=seashell2,label="(28,14)"];
+h->878067[dir=back color="blue"]
+878067[shape=record, style=filled, fillcolor=seashell2,label="(28,14)"];
+878067->878073
+878073->878067
+878073[shape=record, style=filled, fillcolor=seashell2,label="(27,14)"];
+878073->882957
+882957->878073
+882957[shape=record, style=filled, fillcolor=seashell2,label="(26,14)"];
 null[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
-3197951->null[ color="blue"]
+882957->null[ color="blue"]
 }
 }

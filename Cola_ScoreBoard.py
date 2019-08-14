@@ -26,12 +26,7 @@ class ColaScore:
         aux=self.primero
         contador=0
         while(aux!=None):
-            
-
             aux=aux.siguiente
-
-
-
 
     def eliminar(self):
         aux=self.primero

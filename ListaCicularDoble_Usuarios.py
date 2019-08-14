@@ -52,7 +52,7 @@ class ListaCircularDobleUsuarios:
                 c=str(hash(usuario))
                 ca=str(hash(usuario.siguiente))
 
-                file.write(c +"[fillcolor=seashell2,label=\""+usuario.nombre +"\"];\n")
+                file.write(c +"[fillcolor=seashell2,label=\""+str(usuario.nombre) +"\"];\n")
                 file.write(c + "->" + ca+"\n")
                 file.write(ca + "->" + c+"\n")
 

@@ -1,2 +1,7 @@
 digraph G{ rankdir=LR;
+2942451[shape=record, style=filled, fillcolor=seashell2,label="(sdas,-2)"];
+2942451->2947433
+2947433[shape=record, style=filled, fillcolor=seashell2,label="(Aguilar,7)"];
+null[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
+2947433->null[ color="blue"]
 }

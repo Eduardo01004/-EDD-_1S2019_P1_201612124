@@ -3,7 +3,7 @@ import curses
 from ScorePila import PilaScore
 from curses import KEY_RIGHT, KEY_LEFT, KEY_DOWN, KEY_UP
 import random
-WIDTH = 35
+WIDTH = 60
 HEIGHT = 20
 MAX_X = WIDTH - 2
 MAX_Y = HEIGHT - 2
@@ -19,7 +19,7 @@ class NodoDoble:
         self.atras=None
 
     def __str__(self):
-        return "%s %s" %(self.coorx, self.coory)
+        return "%s %s" %(self.coorx, self.coory) #NodoDoble
 
 class Food(object):
     def __init__(self, window,char='+'):
@@ -38,10 +38,10 @@ class Food(object):
 
     def reset(self):
         self.x = random.randint(1, MAX_X)
-        self.y = random.randint(1, MAX_Y)
+        self.y = random.randint(1, MAX_Y)# clase comida para la cola
 
 
-class ListaDoble:
+class ListaDoble: # clase de todo el juego de la serpiente
     def __init__(self):
         self.primero=None
         self.ultimo=None
@@ -60,6 +60,9 @@ class ListaDoble:
     @property
     def Nivel(self):
         return 'Nivel : {}'.format(self.nivel)
+    @property
+    def Name(self):
+        return 'Usuario : {}'.format(self.nombre)
 
     def Insertar(self,coorx,coory):
         nuevo=NodoDoble(coorx,coory)
@@ -97,13 +100,13 @@ class ListaDoble:
         temp=self.primero
         contador=0
         while temp != None:
-            if contador==0:
+            if contador == 0:
                 window.addstr(temp.coory, temp.coorx, '0')
             else:
-
                 window.addstr(temp.coory, temp.coorx, '#')
-            contador+=1
+            contador += 1
             temp=temp.siguiente
+        return contador
 
     def Comer(self,x,y,s,window):
         a=True
@@ -197,6 +200,7 @@ class ListaDoble:
         while q not in (ord("\n"), ord("m"), ord("q")):
             q = window.getch()
             if q == ord("q"):
+                window.clear()
                 option = "quit"
             elif q == ord("\n"):
                 option = "play again"
@@ -204,7 +208,31 @@ class ListaDoble:
                 option = "menu"
         window.clear()
         return option
-    def Juego(self,window,s,p):
+    def menu_pausa(self,window,snake,score):
+        window.clear()
+        msg = "Presiona P para continuar"
+        centro = round((60-len(msg))/2)
+        window.addstr(0,centro,msg)
+        window.addstr(7,21, '1. Snake Report(Lista Doble)')
+        window.addstr(8,21, '2. ScoreReport(Pila)')
+        window.addstr(11,21, ' Presiona P para continuar')
+        keystroke = -1
+        while(keystroke==-1):
+            keystroke = window.getch()
+            if(keystroke==49): #1
+                snake.GraficarDobleSnake()
+                keystroke=-1
+            elif(keystroke==50):
+                score.Graficarpila()
+                keystroke=-1
+            elif(keystroke==51):#salir
+                pass
+            else:
+                keystroke=-1
+        window.refresh()
+
+
+    def Juego(self,window,s,p,name,cola):
         window.clear()
         window.timeout(100)
         window.keypad(1)
@@ -218,6 +246,7 @@ class ListaDoble:
         prev_button_direction = 1
         button_direction = 1
         tipocomida=False
+        punteolvl2=0
         food=Food(window,"+")
         direction = curses.KEY_RIGHT
 
@@ -233,24 +262,27 @@ class ListaDoble:
             food.render()
             window.addstr(0, 5, s.score)
             window.addstr(0, 20, s.Nivel)
+            window.addstr(0, 35, 'Usuario : {}'.format(name))
 
     #--------------------------DIRECCION DE LAS TECLAS SNAKE------------
             key = window.getch()
             prevKey = direction
             if key == 27:
                 break
-
+            #--------------pausa------------
             direction = direction if key == -1 else key
 
             if direction == ord(' '):                                                             # empty space == '32' which is ASCII for 'space bar'. If the keystroke is spacebar, key is assigned to 32 and gets stuck in this if statement. Then key is reassigned to -1.
                 direction = -1
+                s.menu_pausa(window,s,p)
                 while direction != ord(' '):                                                      # Tried to explain the loop but it takes too much text. Figure it out :D
                     direction = window.getch()
                     curses.beep()                                                           # Added a beep so you can hear when it repeats the loop. Just delete if it's annoying.
 
                 direction = prevKey
-                continue
 
+                continue
+                #---------- pausa--------
             if key == -1:
                 direction = direction
             else:
@@ -291,15 +323,34 @@ class ListaDoble:
             #---------------SERPIERENTE COME*******************
 
             if x == food.x and y == food.y:
-                if tipocomida is True:
+                if tipocomida is True and s.Listar(window)==3:
+                    s.punteo -= 0
+                elif tipocomida is True and s.Listar(window)>3:
                     s.punteo -= 1
                     s.Eliminar_Ultimo()
                     p.Pop()
-                elif tipocomida is False:
+                elif tipocomida is False :
                     s.punteo += 1
                     s.Insertar_Inicio(x,y)
                     p.InsertarScore(auxx,auxy)
                     window.refresh()
+
+                if s.punteo == 5:
+                    punteolvl2 = punteolvl2 + s.punteo
+                    s.punteo=0
+                    s.nivel =2
+                    s.tiempo -= 5
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    window.timeout(s.tiempo)
         #--------------------FABRICAR DOS TIPOS DE COMIDA ----
                 if random.random() > 0.85:
                     food = Food(window, '*')
@@ -315,16 +366,14 @@ class ListaDoble:
 
             #SERPIENTE CHOCA CON ELLA MISMA-----------------
             if s.Colision(x,y)==True:
+                print(punteolvl2)
+                cola.IngresarCola(name,s.punteo)
+                s.punteo=0
+                name=" "
                 while True:
                     opt=s.GameOver(window)
                     if opt == "quit":
-                         curses.endwin()
+                         window.clear()
                          break
-                    elif opt == "play again":
-                        continue
-                    elif opt == "menu":
-                        break
-                #s.GraficarDobleSnake()
-                #p.Graficarpila()
             s.Insertar_Inicio(x,y)
             s.Eliminar_Ultimo()
