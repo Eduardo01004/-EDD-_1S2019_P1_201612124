@@ -72,7 +72,6 @@ class PilaScore:
         file = open("PilaScore.dot", "w")
         file.write("digraph G{ rankdir=LR;\n")
         file.write("node [shape= record, width=.1,height=.1];\n")
-        file.write(" subgraph cluster1{\nlabel=\"PIlA NIVEL1\";\n")
         file.write("nodeTable [label = \" ")
         aux=self.primero
         if self.primero!=None:
@@ -84,7 +83,6 @@ class PilaScore:
                     file.write("|"+"("+str(aux.coorx)+","+str(aux.coory)+")")
                 aux=aux.siguiente
         file.write("\"];\n")
-        file.write("}\n")
         file.write("}\n")
         file.close()
         os.system("dot -Tpng PilaScore.dot -o PilaScore.png")
