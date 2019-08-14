@@ -85,22 +85,7 @@ class PilaScore:
                 aux=aux.siguiente
         file.write("\"];\n")
         file.write("}\n")
-
-        #----------------------PILA 2++--------------------
-        file.write(" subgraph cluster2{\nlabel=\"PIlA NIVEL2\";\n")
-        file.write("nodeTable2 [label = \" ")
-        aux2=self.primero2
-        if self.primero2!=None:
-            while (aux2!=None):
-                if aux2.siguiente2!=None:
-                    file.write("|"+"("+str(aux2.coorx2)+","+str(aux2.coory2)+")")
-
-                else:
-                    c2=str(hash(aux2))
-                    file.write("|"+"("+str(aux2.coorx2)+","+str(aux2.coory2)+")")
-                aux2=aux2.siguiente2
-        file.write("\"];\n")
-        file.write("}\n}\n")
+        file.write("}\n")
         file.close()
         os.system("dot -Tpng PilaScore.dot -o PilaScore.png")
         os.system(" PilaScore.png")

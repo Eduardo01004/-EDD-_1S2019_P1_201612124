@@ -1,35 +1,6 @@
-digraph CircularList {
-2942449[fillcolor=seashell2,label="sdas"];
-2942449->2947371
-2947371->2942449
-2947371[fillcolor=seashell2,label="Eduardo "];
-2947371->2947373
-2947373->2947371
-2947373[fillcolor=seashell2,label="Saul"];
-2947373->2947377
-2947377->2947373
-2947377[fillcolor=seashell2,label="Tun"];
-2947377->2947383
-2947383->2947377
-2947383[fillcolor=seashell2,label="Aguilar"];
-2947383->2947385
-2947385->2947383
-2947385[fillcolor=seashell2,label="nppp"];
-2947385->2947389
-2947389->2947385
-2947389[fillcolor=seashell2,label="sjdfosad"];
-2947389->2947391
-2947391->2947389
-2947391[fillcolor=seashell2,label="sdfasd"];
-2947391->2947395
-2947395->2947391
-2947395[fillcolor=seashell2,label="asdf"];
-2947395->2947399
-2947399->2947395
-2947399[fillcolor=seashell2,label="af"];
-2947399->2947405
-2947405->2947399
-2947405[fillcolor=seashell2,label="5asa"];
-2947405->2942449
-2942449->2947405
+digraph CircularList {rankdir=LR;
+
+933485[fillcolor=seashell2,label="s"];
+933485->933485
+933485->933485
 }

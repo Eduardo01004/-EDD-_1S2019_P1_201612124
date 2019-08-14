@@ -39,6 +39,19 @@ class Food(object):
     def reset(self):
         self.x = random.randint(1, MAX_X)
         self.y = random.randint(1, MAX_Y)# clase comida para la cola
+class Muros(object):
+    def __init__(self, window,char='+'):
+        self.x = 10
+        self.y = 10
+        self.window = window
+        self.char=char
+
+    def render(self):
+        self.window.addstr(10, 10, self.char)
+
+    def reset(self):
+        self.x = random.randint(1, MAX_X)
+        self.y = random.randint(1, MAX_Y)# clase comida para la cola
 
 
 class ListaDoble: # clase de todo el juego de la serpiente
@@ -99,11 +112,12 @@ class ListaDoble: # clase de todo el juego de la serpiente
     def Listar(self,window):
         temp=self.primero
         contador=0
+        curses.init_pair(2, curses.COLOR_GREEN,curses.COLOR_BLACK)
         while temp != None:
             if contador == 0:
                 window.addstr(temp.coory, temp.coorx, '0')
             else:
-                window.addstr(temp.coory, temp.coorx, '#')
+                window.addstr(temp.coory, temp.coorx, '#',curses.color_pair(2))
             contador += 1
             temp=temp.siguiente
         return contador
@@ -185,37 +199,39 @@ class ListaDoble: # clase de todo el juego de la serpiente
         os.system(" ListaDobleSnake.png")
     def GameOver(sefl,window):
         window.clear()
+        window.border()
         msg = "Game Over!"
         centro = round((60-len(msg))/2)
-        window.addstr(0,centro,msg)
-
-        window.addstr(7,21, '1. Play')
-        window.addstr(8,21, '2. Scoreboard')
-        window.addstr(9,21, '3. User Selection')
-        window.addstr(10,21, '4. Reports')
-        window.addstr(11,21, '5. Bulk Loading')
-        window.addstr(12,21, '6. Exit')
+        window.addstr(10,centro,msg)
         window.timeout(-1)
+        curses.beep()
         q = None
         while q not in (ord("\n"), ord("m"), ord("q")):
             q = window.getch()
             if q == ord("q"):
-                window.clear()
                 option = "quit"
-            elif q == ord("\n"):
-                option = "play again"
-            elif q == ord("m"):
-                option = "menu"
-        window.clear()
+                break
         return option
+
+    def Game_Win(self,window):
+        window.clear()
+        window.border()
+        msg = "Felicidades Ganaste :)"
+        centro = round((60-len(msg))/2)
+        window.addstr(10,centro,msg)
+        window.timeout(-1)
+        curses.beep()
+
     def menu_pausa(self,window,snake,score):
         window.clear()
-        msg = "Presiona P para continuar"
+        window.border()
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+        msg = "Presiona espacio para continuar"
         centro = round((60-len(msg))/2)
-        window.addstr(0,centro,msg)
-        window.addstr(7,21, '1. Snake Report(Lista Doble)')
-        window.addstr(8,21, '2. ScoreReport(Pila)')
-        window.addstr(11,21, ' Presiona P para continuar')
+        window.addstr(0,centro,msg,curses.color_pair(1))
+        window.addstr(7,16, '1. Snake Report(Lista Doble)')
+        window.addstr(8,16, '2. ScoreReport(Pila)')
+        window.addstr(11,16, ' Presiona espacio para continuar',curses.color_pair(1))
         keystroke = -1
         while(keystroke==-1):
             keystroke = window.getch()
@@ -234,7 +250,7 @@ class ListaDoble: # clase de todo el juego de la serpiente
 
     def Juego(self,window,s,p,name,cola):
         window.clear()
-        window.timeout(100)
+        window.timeout(TIMEOUT)
         window.keypad(1)
         curses.noecho()
         curses.curs_set(0)
@@ -248,8 +264,9 @@ class ListaDoble: # clase de todo el juego de la serpiente
         tipocomida=False
         punteolvl2=0
         food=Food(window,"+")
+        muro=Muros(window,"=")
         direction = curses.KEY_RIGHT
-
+        muro=Muros(window,"=")
         while True:
             window.clear()
             window.border(0)
@@ -269,7 +286,7 @@ class ListaDoble: # clase de todo el juego de la serpiente
             prevKey = direction
             if key == 27:
                 break
-            #--------------pausa------------
+            #--------------pausa-------------------------------------
             direction = direction if key == -1 else key
 
             if direction == ord(' '):                                                             # empty space == '32' which is ASCII for 'space bar'. If the keystroke is spacebar, key is assigned to 32 and gets stuck in this if statement. Then key is reassigned to -1.
@@ -282,7 +299,7 @@ class ListaDoble: # clase de todo el juego de la serpiente
                 direction = prevKey
 
                 continue
-                #---------- pausa--------
+                #---------- pausa--------------------------------
             if key == -1:
                 direction = direction
             else:
@@ -324,22 +341,23 @@ class ListaDoble: # clase de todo el juego de la serpiente
 
             if x == food.x and y == food.y:
                 if tipocomida is True and s.Listar(window)==3:
-                    s.punteo -= 0
+                    s.punteo = 0
+                    punteolvl2 = 0
                 elif tipocomida is True and s.Listar(window)>3:
                     s.punteo -= 1
+                    punteolvl2 -= 1
                     s.Eliminar_Ultimo()
                     p.Pop()
                 elif tipocomida is False :
                     s.punteo += 1
+                    punteolvl2 += 1
                     s.Insertar_Inicio(x,y)
                     p.InsertarScore(auxx,auxy)
                     window.refresh()
 
-                if s.punteo == 5:
-                    punteolvl2 = punteolvl2 + s.punteo
-                    s.punteo=0
-                    s.nivel =2
-                    s.tiempo -= 5
+                if s.punteo > 15:
+                    s.punteo = 0
+                    s.nivel = 2
                     s.Eliminar_Ultimo()
                     p.Pop()
                     s.Eliminar_Ultimo()
@@ -350,30 +368,52 @@ class ListaDoble: # clase de todo el juego de la serpiente
                     p.Pop()
                     s.Eliminar_Ultimo()
                     p.Pop()
-                    window.timeout(s.tiempo)
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    s.Eliminar_Ultimo()
+                    p.Pop()
+                    window.timeout(50)
         #--------------------FABRICAR DOS TIPOS DE COMIDA ----
                 if random.random() > 0.85:
                     food = Food(window, '*')
                     food.render()
                     tipocomida = True
-                    print("malo")
                 else:
                     food=Food(window,"+")
                     food.render()
                     tipocomida = False
-                    print("bueno")
                 s.reiniciar()# REINICIA COORDENADAS
-
+#-----------------------Ganar PArtida------------------*
+            if punteolvl2 == 30:
+                s.Game_Win(window)
+                cola.IngresarCola(name,punteolvl2)
+                break
             #SERPIENTE CHOCA CON ELLA MISMA-----------------
             if s.Colision(x,y)==True:
-                print(punteolvl2)
-                cola.IngresarCola(name,s.punteo)
-                s.punteo=0
+                cola.IngresarCola(name,punteolvl2)
+                s.punteo = 0
+                punteolvl2 = 0
                 name=" "
                 while True:
                     opt=s.GameOver(window)
                     if opt == "quit":
-                         window.clear()
                          break
+                break
             s.Insertar_Inicio(x,y)
             s.Eliminar_Ultimo()

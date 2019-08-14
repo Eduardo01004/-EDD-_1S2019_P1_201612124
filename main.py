@@ -11,6 +11,7 @@ listausuarios=ListaCircularDobleUsuarios()
 cola=ColaScore()
 WIDTH = 35 #ancho
 HEIGHT = 20 # altura
+username=""
 #------------------------------MENU PRINCIPAL-----------------------------
 def Menu_Principal(window):
 
@@ -42,11 +43,15 @@ def m(window):
     keystroke = -1
     while(keystroke==-1):
         keystroke = window.getch()
-        if(keystroke==49): #1
+        if(keystroke==49):
+            global username
             Titulo(window, ' PLAY ')
-            a=Crear_Usuario(window)
-
-            listasnake.Juego(window,listasnake,score,"".join(map(chr, a)),cola)
+            if username == "":
+                a = Crear_Usuario(window)
+                username = "".join(map(chr, a))
+                listasnake.Juego(window,listasnake,score,username,cola)
+            else:
+                listasnake.Juego(window,listasnake,score,username,cola)
             TeclaESC(window)
             Menu_Principal(window)
             keystroke=-1
@@ -102,9 +107,7 @@ def LeerArchivo_Usuarios(window):
                 centro = round((60-len(msg))/2)
                 window.addstr(10,centro,msg)
                 sel = window.getch()
-                if sel == 10:
-                    Menu_Principal(window)
-                    m(window)
+                if sel == 27:
                     break
     except:
         while True:
@@ -124,7 +127,6 @@ def carga(window):
     window.border(0)
     Titulo(window,' BULK LOADING ')
     msg="Ingresa El nombre del archivo csv"
-
     centro = round((60-len(msg))/2)
     window.addstr(10,centro,msg)
     texto = ""
@@ -152,6 +154,7 @@ def Menu_Usuarios(window,listasnake,score):
     temp=listausuarios.primero
     temp2=listausuarios.ultimo
     validar=True
+    global username
     if temp != None:
         name = temp.nombre
         print_Users(window, name)
@@ -164,12 +167,14 @@ def Menu_Usuarios(window,listasnake,score):
                 temp = temp.anterior
                 name = temp.nombre
             elif key == 10:
-                listasnake.Juego(window,listasnake,score,name,cola)
+                username =name
+                listasnake.Juego(window,listasnake,score,username,cola)
+                break
+            elif key == 27:
                 break
             print_Users(window, name)
     else:
         print_Users(window, "Vacio")
-
 #-----------------------------MENU DE REPORTES ------------------------------
 def Menu_Reportes(window):
     Titulo(window,'Reportes')
@@ -204,19 +209,18 @@ def Principal_Usuarios(window,listasnake,score):
             Menu_Principal(window)
             m(window)
             keystroke=-1
-        elif(keystroke==54):#salir
+        elif(keystroke==54):
             pass
         else:
             keystroke=-1
     window.refresh()
-
 #-----------------------------OPCION DEL SCOREBOARD DE LA COLA ----------------
 def Scoreboard(screen):
 
+    Cola()
     screen.clear()
     Titulo(screen, ' SCOREBOARD ')
     temp=cola.primero
-
     max_row = 10 #max number of rows
     contador=0
     if temp != None:
@@ -232,25 +236,33 @@ def Scoreboard(screen):
             screen.refresh()
     else:
         screen.addstr( 10, 25, "Vacio" )
-
-
-
 #--------------------------Crear nuevo usuario-------------------
 def Crear_Usuario(screen):
     curses.echo()
     curses.curs_set(True)
     screen.addstr(5, 5, "No ha cargado usuario: ")
-    screen.addstr(10, 5, "Ingrese nombre usuario: ")
+    screen.addstr(10, 5, "Ingrese nombre usuario")
+    global username
     jugador = screen.getstr()
-    listausuarios.InsertarUsuario("".join(map(chr, jugador)))
+    username = "".join(map(chr, jugador))
+    listausuarios.InsertarUsuario(username)
     curses.curs_set(False)
     screen.clear()
     return jugador
 
+#Verificar que la cola tiene tope de 10-------
+def Cola():
+    temp=cola.primero
+    contador=0
+    while temp !=None:
+        if contador > 9:
+            cola.eliminar()
+        contador +=1
+        temp = temp.siguiente
 #------------------------INICIO DEL PROGRAMA----------------------------
 curses.initscr()
 window = curses.newwin(20,60,0,0)
-window.timeout(300)
+curses.start_color()
 window.keypad(True)
 curses.noecho()
 curses.curs_set(0)

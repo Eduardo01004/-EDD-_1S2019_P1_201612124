@@ -44,7 +44,7 @@ class ListaCircularDobleUsuarios:
 
     def GraficarUsuarios(self):
         file = open("ListaDobleCircularUsuarios.dot", "w")
-        file.write("digraph CircularList {\n")
+        file.write("digraph CircularList {rankdir=LR;\n\n")
         usuario=self.primero
         validar=True
         if self.primero!=None:

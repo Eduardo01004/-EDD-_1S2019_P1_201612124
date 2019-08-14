@@ -2,16 +2,22 @@ digraph G {rankdir = "LR";
  subgraph cluster3{
 label="Snake";
 h[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
-878067[shape=record, style=filled, fillcolor=seashell2,label="(28,14)"];
-h->878067[dir=back color="blue"]
-878067[shape=record, style=filled, fillcolor=seashell2,label="(28,14)"];
-878067->878073
-878073->878067
-878073[shape=record, style=filled, fillcolor=seashell2,label="(27,14)"];
-878073->882957
-882957->878073
-882957[shape=record, style=filled, fillcolor=seashell2,label="(26,14)"];
+949269[shape=record, style=filled, fillcolor=seashell2,label="(52,11)"];
+h->949269[dir=back color="blue"]
+949269[shape=record, style=filled, fillcolor=seashell2,label="(52,11)"];
+949269->949315
+949315->949269
+949315[shape=record, style=filled, fillcolor=seashell2,label="(52,10)"];
+949315->949309
+949309->949315
+949309[shape=record, style=filled, fillcolor=seashell2,label="(53,10)"];
+949309->949307
+949307->949309
+949307[shape=record, style=filled, fillcolor=seashell2,label="(53,11)"];
+949307->949277
+949277->949307
+949277[shape=record, style=filled, fillcolor=seashell2,label="(53,12)"];
 null[shape=record, style=filled, fillcolor=seashell2,label="NULL"];
-882957->null[ color="blue"]
+949277->null[ color="blue"]
 }
 }
